@@ -1,0 +1,492 @@
+for rupees//////////////////////////////////////////////////////
+
+
+
+Function ConvertCurrencyToEnglish(ByVal MyNumber)
+' Edited by Karthikeyan karthikeyan@livetolearn.in
+  Dim Temp
+         Dim Rupees, Paise
+         Dim DecimalPlace, Count
+ 
+         ReDim Place(9) As String
+         Place(2) = " Thousand "
+         Place(3) = " lakh "
+         Place(4) = " Crore "
+ 
+ 
+         ' Convert MyNumber to a string, trimming extra spaces.
+         MyNumber = Trim(Str(MyNumber))
+ 
+         ' Find decimal place.
+         DecimalPlace = InStr(MyNumber, ".")
+ 
+         ' If we find decimal place...
+         If DecimalPlace > 0 Then
+            ' Convert Paise
+            Temp = Left(Mid(MyNumber, DecimalPlace + 1) & "00", 2)
+            ' Hi! Note the above line Mid function it gives right portion
+            ' after the decimal point
+            'if only . and no numbers such as 789. accures, mid returns nothing
+            ' to avoid error we added 00
+            ' Left function gives only left portion of the string with specified places here 2
+ 
+ 
+            Paise = ConvertTens(Temp)
+ 
+ 
+            ' Strip off paise from remainder to convert.
+            MyNumber = Trim(Left(MyNumber, DecimalPlace - 1))
+         End If
+ 
+         Count = 1
+        If MyNumber <> "" Then
+ 
+            ' Convert last 3 digits of MyNumber to Indian Rupees.
+            Temp = ConvertHundreds(Right(MyNumber, 3))
+ 
+            If Temp <> "" Then Rupees = Temp & Place(Count) & Rupees
+ 
+            If Len(MyNumber) > 3 Then
+               ' Remove last 3 converted digits from MyNumber.
+               MyNumber = Left(MyNumber, Len(MyNumber) - 3)
+            Else
+               MyNumber = ""
+            End If
+ 
+        End If
+ 
+            ' convert last two digits to of mynumber
+            Count = 2
+ 
+            Do While MyNumber <> ""
+            Temp = ConvertTens(Right("0" & MyNumber, 2))
+ 
+            If Temp <> "" Then Rupees = Temp & Place(Count) & Rupees
+            If Len(MyNumber) > 2 Then
+               ' Remove last 2 converted digits from MyNumber.
+               MyNumber = Left(MyNumber, Len(MyNumber) - 2)
+ 
+            Else
+               MyNumber = ""
+            End If
+            Count = Count + 1
+ 
+            Loop
+ 
+ 
+ 
+ 
+         ' Clean up rupees.
+        Select Case Rupees
+            Case ""
+               Rupees = ""
+            Case "One"
+               Rupees = "Rupee One"
+            Case Else
+               Rupees = "Rupees " & Rupees
+         End Select
+ 
+         ' Clean up paise.
+         Select Case Paise
+            Case ""
+               Paise = ""
+            Case "One"
+               Paise = "One Paise"
+            Case Else
+               Paise = Paise & " Paise"
+         End Select
+         
+         If Rupees = "" Then
+         ConvertCurrencyToEnglish = Paise & " Only"
+         ElseIf Paise = "" Then
+         ConvertCurrencyToEnglish = Rupees & " Only"
+         Else
+         ConvertCurrencyToEnglish = Rupees & " and " & Paise & " Only"
+         End If
+         
+End Function
+ 
+ 
+Private Function ConvertDigit(ByVal MyDigit)
+        Select Case Val(MyDigit)
+            Case 1: ConvertDigit = "One"
+            Case 2: ConvertDigit = "Two"
+            Case 3: ConvertDigit = "Three"
+            Case 4: ConvertDigit = "Four"
+            Case 5: ConvertDigit = "Five"
+            Case 6: ConvertDigit = "Six"
+            Case 7: ConvertDigit = "Seven"
+            Case 8: ConvertDigit = "Eight"
+            Case 9: ConvertDigit = "Nine"
+            Case Else: ConvertDigit = ""
+         End Select
+ 
+End Function
+ 
+Private Function ConvertHundreds(ByVal MyNumber)
+    Dim Result As String
+ 
+         ' Exit if there is nothing to convert.
+         If Val(MyNumber) = 0 Then Exit Function
+ 
+         ' Append leading zeros to number.
+         MyNumber = Right("000" & MyNumber, 3)
+ 
+         ' Do we have a hundreds place digit to convert?
+         If Left(MyNumber, 1) <> "0" Then
+            Result = ConvertDigit(Left(MyNumber, 1)) & " Hundred "
+         End If
+ 
+         ' Do we have a tens place digit to convert?
+         If Mid(MyNumber, 2, 1) <> "0" Then
+            Result = Result & ConvertTens(Mid(MyNumber, 2))
+         Else
+            ' If not, then convert the ones place digit.
+            Result = Result & ConvertDigit(Mid(MyNumber, 3))
+         End If
+ 
+         ConvertHundreds = Trim(Result)
+End Function
+ 
+ 
+Private Function ConvertTens(ByVal MyTens)
+          Dim Result As String
+ 
+         ' Is value between 10 and 19?
+         If Val(Left(MyTens, 1)) = 1 Then
+            Select Case Val(MyTens)
+               Case 10: Result = "Ten"
+               Case 11: Result = "Eleven"
+               Case 12: Result = "Twelve"
+               Case 13: Result = "Thirteen"
+               Case 14: Result = "Fourteen"
+               Case 15: Result = "Fifteen"
+               Case 16: Result = "Sixteen"
+               Case 17: Result = "Seventeen"
+               Case 18: Result = "Eighteen"
+               Case 19: Result = "Nineteen"
+               Case Else
+            End Select
+         Else
+            ' .. otherwise it's between 20 and 99.
+            Select Case Val(Left(MyTens, 1))
+               Case 2: Result = "Twenty "
+               Case 3: Result = "Thirty "
+               Case 4: Result = "Forty "
+               Case 5: Result = "Fifty "
+               Case 6: Result = "Sixty "
+               Case 7: Result = "Seventy "
+               Case 8: Result = "Eighty "
+               Case 9: Result = "Ninety "
+               Case Else
+            End Select
+ 
+            ' Convert ones place digit.
+            Result = Result & ConvertDigit(Right(MyTens, 1))
+         End If
+ 
+         ConvertTens = Result
+End Function
+
+
+
+for dinars////////////////////////////////////////////////////////////////////////////////////////
+Function SpellNumber(ByVal MyNumber)
+    Dim Dinars, Fils, Temp
+    Dim DecimalPlace, Count
+ 
+    ReDim Place(9) As String
+    Place(2) = " Thousand "
+    Place(3) = " Million "
+    Place(4) = " Billion "
+    Place(5) = " Trillion "
+ 
+    ' String representation of amount
+    MyNumber = Trim(Str(MyNumber))
+ 
+    ' Position of decimal place 0 if none
+    
+    DecimalPlace = InStr(MyNumber, ".")
+    'Convert Fils and set MyNumber to dollar amount
+    If DecimalPlace > 0 Then
+        Fils = (Round(MyNumber - (Int(MyNumber)), 3) * 1000) & "/1000"
+        
+        MyNumber = Trim(Left(MyNumber, DecimalPlace - 1))
+    
+    '(D9-(INT(D9)))*1000
+'Fils = GetHundreds(Left(Mid(MyNumber, DecimalPlace + 1) & "000", 3))
+     '   MyNumber = Trim(Left(MyNumber, DecimalPlace - 1))
+
+
+'Fils = GetTens(Left(Mid(MyNumber, DecimalPlace + 1) & "00", 2))
+ '       MyNumber = Trim(Left(MyNumber, DecimalPlace - 1))
+    
+    
+    
+    End If
+ 
+    Count = 1
+    Do While MyNumber <> ""
+       Temp = GetHundreds(Right(MyNumber, 3))
+       If Temp <> "" Then Dinars = Temp & Place(Count) & Dinars
+          If Len(MyNumber) > 3 Then
+             MyNumber = Left(MyNumber, Len(MyNumber) - 3)
+        Else
+            MyNumber = ""
+        End If
+        Count = Count + 1
+    Loop
+ 
+    Select Case Dinars
+        Case ""
+            Dinars = ""
+            'Dinars = "No Dinars"
+        Case "One"
+            Dinars = "Bahraini Dinar One"
+            'Dinars = "One Dollar"
+        Case Else
+            Dinars = Dinars
+    End Select
+ 
+    Select Case Fils
+        Case ""
+            Fils = " Only."
+            'Fils = " and No Fils"
+        Case "One"
+            Fils = " and Fils One "
+        Case Else
+            Fils = " and " & "Fils " & Fils & " Only."
+    End Select
+ 
+    SpellNumber = Dinars & Fils
+End Function
+ 
+'*******************************************
+' Converts a number from 100-999 into text *
+'*******************************************
+Function GetHundreds(ByVal MyNumber)
+    Dim Result As String
+ 
+    If Val(MyNumber) = 0 Then Exit Function
+    MyNumber = Right("000" & MyNumber, 3)
+ 
+    'Convert the hundreds place
+    If Mid(MyNumber, 1, 1) <> "0" Then
+        Result = GetDigit(Mid(MyNumber, 1, 1)) & " Hundred "
+    End If
+ 
+    'Convert the tens and ones place
+    If Mid(MyNumber, 2, 1) <> "0" Then
+        Result = Result & GetTens(Mid(MyNumber, 2))
+    Else
+        Result = Result & GetDigit(Mid(MyNumber, 3))
+    End If
+ 
+    GetHundreds = Result
+End Function
+ 
+'*********************************************
+' Converts a number from 10 to 99 into text. *
+'*********************************************
+Function GetTens(TensText)
+    Dim Result As String
+ 
+    Result = ""           'null out the temporary function value
+    If Val(Left(TensText, 1)) = 1 Then   ' If value between 10-19
+        Select Case Val(TensText)
+            Case 10: Result = "Ten"
+            Case 11: Result = "Eleven"
+            Case 12: Result = "Twelve"
+            Case 13: Result = "Thirteen"
+            Case 14: Result = "Fourteen"
+            Case 15: Result = "Fifteen"
+            Case 16: Result = "Sixteen"
+            Case 17: Result = "Seventeen"
+            Case 18: Result = "Eighteen"
+            Case 19: Result = "Nineteen"
+            Case Else
+        End Select
+      Else                                 ' If value between 20-99
+        Select Case Val(Left(TensText, 1))
+            Case 2: Result = "Twenty "
+            Case 3: Result = "Thirty "
+            Case 4: Result = "Forty "
+            Case 5: Result = "Fifty "
+            Case 6: Result = "Sixty "
+            Case 7: Result = "Seventy "
+            Case 8: Result = "Eighty "
+            Case 9: Result = "Ninety "
+            Case Else
+        End Select
+         Result = Result & GetDigit _
+            (Right(TensText, 1))  'Retrieve ones place
+      End If
+      GetTens = Result
+   End Function
+ 
+'*******************************************
+' Converts a number from 1 to 9 into text. *
+'*******************************************
+Function GetDigit(Digit)
+    Select Case Val(Digit)
+        Case 1: GetDigit = "One"
+        Case 2: GetDigit = "Two"
+        Case 3: GetDigit = "Three"
+        Case 4: GetDigit = "Four"
+        Case 5: GetDigit = "Five"
+        Case 6: GetDigit = "Six"
+        Case 7: GetDigit = "Seven"
+        Case 8: GetDigit = "Eight"
+        Case 9: GetDigit = "Nine"
+        Case Else: GetDigit = ""
+    End Select
+End Function
+
+
+alternative code////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Function English(ByVal N As Currency) As String
+
+   Const Thousand = 1000@
+   Const Million = Thousand * Thousand
+   Const Billion = Thousand * Million
+   Const Trillion = Thousand * Billion
+
+   If (N = 0@) Then English = "zero": Exit Function
+
+   Dim Buf As String: If (N < 0@) Then Buf = "negative " Else Buf = ""
+   Dim Frac As Currency: Frac = Abs(N - Fix(N))
+   If (N < 0@ Or Frac <> 0@) Then N = Abs(Fix(N))
+   Dim AtLeastOne As Integer: AtLeastOne = N >= 1
+
+   If (N >= Trillion) Then
+      Debug.Print N
+      Buf = Buf & EnglishDigitGroup(Int(N / Trillion)) & " trillion"
+      N = N - Int(N / Trillion) * Trillion
+      If (N >= 1@) Then Buf = Buf & " "
+   End If
+
+   If (N >= Billion) Then
+      Debug.Print N
+      Buf = Buf & EnglishDigitGroup(Int(N / Billion)) & " billion"
+      N = N - Int(N / Billion) * Billion
+      If (N >= 1@) Then Buf = Buf & " "
+   End If
+
+   If (N >= Million) Then
+      Debug.Print N
+      Buf = Buf & EnglishDigitGroup(N \ Million) & " million"
+      N = N Mod Million
+      If (N >= 1@) Then Buf = Buf & " "
+   End If
+
+   If (N >= Thousand) Then
+      Debug.Print N
+      Buf = Buf & EnglishDigitGroup(N \ Thousand) & " thousand"
+      N = N Mod Thousand
+      If (N >= 1@) Then Buf = Buf & " "
+   End If
+
+   If (N >= 1@) Then
+      Debug.Print N
+      Buf = Buf & EnglishDigitGroup(N)
+   End If
+
+   If (Frac = 0@) Then
+      Buf = Buf & " exactly"
+   ElseIf (Int(Frac * 100@) = Frac * 100@) Then
+      If AtLeastOne Then Buf = Buf & " and "
+      Buf = Buf & Format$(Frac * 100@, "00") & "/100"
+   Else
+      If AtLeastOne Then Buf = Buf & " and "
+      Buf = Buf & Format$(Frac * 10000@, "0000") & "/10000"
+   End If
+
+   English = Buf
+End Function
+
+Private Function EnglishDigitGroup(ByVal N As Integer) As String
+
+   Const Hundred = " hundred"
+   Const One = "one"
+   Const Two = "two"
+   Const Three = "three"
+   Const Four = "four"
+   Const Five = "five"
+   Const Six = "six"
+   Const Seven = "seven"
+   Const Eight = "eight"
+   Const Nine = "nine"
+   Dim Buf As String: Buf = ""
+   Dim Flag As Integer: Flag = False
+
+   Select Case (N \ 100)
+      Case 0: Buf = "": Flag = False
+      Case 1: Buf = One & Hundred: Flag = True
+      Case 2: Buf = Two & Hundred: Flag = True
+      Case 3: Buf = Three & Hundred: Flag = True
+      Case 4: Buf = Four & Hundred: Flag = True
+      Case 5: Buf = Five & Hundred: Flag = True
+      Case 6: Buf = Six & Hundred: Flag = True
+      Case 7: Buf = Seven & Hundred: Flag = True
+      Case 8: Buf = Eight & Hundred: Flag = True
+      Case 9: Buf = Nine & Hundred: Flag = True
+   End Select
+
+   If (Flag <> False) Then N = N Mod 100
+   If (N > 0) Then
+      If (Flag <> False) Then Buf = Buf & " "
+   Else
+      EnglishDigitGroup = Buf
+      Exit Function
+   End If
+
+   Select Case (N \ 10)
+      Case 0, 1: Flag = False
+      Case 2: Buf = Buf & "twenty": Flag = True
+      Case 3: Buf = Buf & "thirty": Flag = True
+      Case 4: Buf = Buf & "forty": Flag = True
+      Case 5: Buf = Buf & "fifty": Flag = True
+      Case 6: Buf = Buf & "sixty": Flag = True
+      Case 7: Buf = Buf & "seventy": Flag = True
+      Case 8: Buf = Buf & "eighty": Flag = True
+      Case 9: Buf = Buf & "ninety": Flag = True
+   End Select
+
+   If (Flag <> False) Then N = N Mod 10
+   If (N > 0) Then
+      If (Flag <> False) Then Buf = Buf & "-"
+   Else
+      EnglishDigitGroup = Buf
+      Exit Function
+   End If
+
+   Select Case (N)
+      Case 0:
+      Case 1: Buf = Buf & One
+      Case 2: Buf = Buf & Two
+      Case 3: Buf = Buf & Three
+      Case 4: Buf = Buf & Four
+      Case 5: Buf = Buf & Five
+      Case 6: Buf = Buf & Six
+      Case 7: Buf = Buf & Seven
+      Case 8: Buf = Buf & Eight
+      Case 9: Buf = Buf & Nine
+      Case 10: Buf = Buf & "ten"
+      Case 11: Buf = Buf & "eleven"
+      Case 12: Buf = Buf & "twelve"
+      Case 13: Buf = Buf & "thirteen"
+      Case 14: Buf = Buf & "fourteen"
+      Case 15: Buf = Buf & "fifteen"
+      Case 16: Buf = Buf & "sixteen"
+      Case 17: Buf = Buf & "seventeen"
+      Case 18: Buf = Buf & "eighteen"
+      Case 19: Buf = Buf & "nineteen"
+   End Select
+
+   EnglishDigitGroup = Buf
+
+End Function
+
+
