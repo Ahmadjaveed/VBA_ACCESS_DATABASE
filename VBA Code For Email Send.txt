@@ -1,0 +1,81 @@
+Dim Msg As String
+    Msg = "Dear" & FirstName & ", <P>" & _
+    "Your statement balance as of " & Date & "is" & Format(CreditLimit, "Currency") & ".<P>" & _
+    "If you have any questions please contact me at 555-2222."
+
+
+     'Remember to add REFERENCE to Microsoft Outlook Object Library
+     
+    Dim O As Outlook.Application
+    Dim M As Outlook.MailItem
+    
+    Set O = New Outlook.Application
+    Set M = O.CreateItem(olMailItem)
+    With M
+          .BodyFormat = olFormatHTML
+          .HTMLBody = Msg
+          '.Body Txt if you use olFormatPlain
+          .To = Email
+          '.cc "amicron@gmail.com; richard@599cd.com"
+          '.BCC "whoever@amicron.com"
+          .Subject = "Statement Balance " & Now()
+          .Display
+          '.Send
+    End With
+    
+    Set M = Nothing
+    Set O = Nothing
+
+
+attachment /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.Attachments.Add "C:\Users\Ahmad\Desktop\test\Book.xlsx"
+
+
+
+mass emails/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   Dim Msg As String
+    Msg = "Dear" & FirstName & ", <P>" & _
+    "Your statement balance as of " & Date & "is" & amount
+
+     'Remember to add REFERENCE to Microsoft Outlook Object Library
+    Dim rs As Recordset
+    Dim O As Outlook.Application
+    Dim M As Outlook.MailItem
+    Dim customeremail As String
+
+    
+    Set O = New Outlook.Application
+    Set M = O.CreateItem(olMailItem)
+    With M
+           Set rs = CurrentDb.OpenRecordset("select email from data")
+           If rs.RecordCount > 0 Then
+           rs.MoveFirst
+           Do Until rs.EOF
+            If IsNull(rs!email) Then
+            rs.MoveNext
+            Else
+            customeremail = customeremail & rs!email & ";"
+            .To = customeremail
+            rs.MoveNext
+            End If
+            Loop
+           Else
+           MsgBox "NO one has email address"
+           End If
+           Set rs = Nothing
+          .BodyFormat = olFormatHTML
+          .HTMLBody = Msg
+          '.Body Txt if you use olFormatPlain
+          
+          '.cc "amicron@gmail.com; richard@599cd.com"
+          '.BCC "whoever@amicron.com"
+          .Subject = "Statement Balance " & Now()
+          .Display
+          '.Send
+    End With
+    
+    Set M = Nothing
+    Set O = Nothing
+
+
